@@ -4,6 +4,8 @@ const readline = require("readline-sync");
 const moment = require("moment");
 const chalk = require("chalk");
 
+const { logger } = require("./tools");
+
 const app = express();
 
 const getRequestIdUrl =
@@ -11,23 +13,30 @@ const getRequestIdUrl =
 const getFlightInfoUrl =
   "https://ws.alibaba.ir/api/v1/flights/domestic/available";
 
-const port = process.env.PORT || 8081;
+const port = process.env.PORT || 8080;
 
-app.listen(port, () => {
-  console.log(`Server is started on localhost:${port} ...`);
-});
+app.listen(port, () =>
+  logger(`Server is started on localhost:${port} ...`, "green")
+);
 
-const getInput = (text) => readline.question(chalk.red(text));
+const getInput = (text, color) => {
+  switch (color) {
+    case "red":
+      return readline.question(chalk.red(text));
+    case "blue":
+      return readline.question(chalk.blue(text));
+  }
+};
 
 const main = async (body) => {
   try {
     const { data: firstReq } = await axios.post(getRequestIdUrl, body);
-    console.log(firstReq);
+    logger(firstReq, "green");
     setTimeout(async () => {
       const { data: secondReq } = await axios.get(
         `${getFlightInfoUrl}/${firstReq?.result?.requestId}`
       );
-      console.log(secondReq);
+      logger(secondReq, "blue");
     }, 2500);
   } catch (e) {
     console.log(e);
@@ -42,26 +51,29 @@ const validationDateFormat = (date) => {
 
 (async () => {
   const departureDate = await getInput(
-    "Enter your desired date with this format (yyyy-mm-dd) : "
+    "Enter your desired date with this format (yyyy-mm-dd) : ",
+    "red"
   );
   if (!validationDateFormat(departureDate)) {
-    console.log("Please enter date with correct format.");
+    logger("Please enter date with correct format.", "red");
     process.exit(1);
   }
-  const origin = await getInput("Enter your origin : ");
+  const origin = await getInput("Enter your origin : ", "red");
   if (!origin) {
-    console.log("Please enter your origin");
+    logger("Please enter your origin", "red");
     process.exit(1);
   }
-  const destination = await getInput("Enter your destination : ");
+  const destination = await getInput("Enter your destination : ", "red");
   if (!destination) {
-    console.log("Please enter your destination");
+    logger("Please enter your destination", "red");
     process.exit(1);
   }
-  const adult = +(await getInput("Enter your adult count (optional) : ")) || 1;
-  const child = +(await getInput("Enter your child count (optional) : ")) || 0;
+  const adult =
+    +(await getInput("Enter your adult count (optional) : ", "blue")) || 1;
+  const child =
+    +(await getInput("Enter your child count (optional) : ", "blue")) || 0;
   const infant =
-    +(await getInput("Enter your infant count (optional) : ")) || 0;
+    +(await getInput("Enter your infant count (optional) : ", "blue")) || 0;
   const body = {
     origin,
     destination,
