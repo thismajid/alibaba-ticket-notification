@@ -1,6 +1,7 @@
 const express = require("express");
 const axios = require("axios");
 const readline = require("readline-sync");
+const moment = require("moment");
 
 const app = express();
 
@@ -9,7 +10,13 @@ const getRequestIdUrl =
 const getFlightInfoUrl =
   "https://ws.alibaba.ir/api/v1/flights/domestic/available";
 
-(async () => {})();
+const port = process.env.PORT || 8080;
+
+app.listen(port, () => {
+  console.log(`Server is started on localhost:${port} ...`);
+});
+
+const getInput = (text) => readline.question(text);
 
 const main = async () => {
   try {
@@ -33,12 +40,21 @@ const main = async () => {
   }
 };
 
-setInterval(async () => {
-  await main();
-}, 20000);
+const validationDateFormat = (date) => {
+  const dateFormat = "YYYY-MM-DD";
+  const toDateFormat = moment(new Date(date)).format(dateFormat);
+  return moment(toDateFormat, dateFormat, true).isValid();
+};
 
-const port = process.env.PORT || 8080;
-
-app.listen(port, () => {
-  console.log(`Server is started on localhost:${port} ...`);
-});
+(async () => {
+  const date = await getInput(
+    "Enter your desired date with this format (yyyy-mm-dd) : "
+  );
+  if (!validationDateFormat(date)) {
+    console.log("Please enter date with correct format.");
+    process.exit(1);
+  }
+  setInterval(async () => {
+    await main();
+  }, 20000);
+})();
