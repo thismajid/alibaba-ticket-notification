@@ -2,6 +2,7 @@ const express = require("express");
 const axios = require("axios");
 const readline = require("readline-sync");
 const moment = require("moment");
+const chalk = require("chalk");
 
 const app = express();
 
@@ -10,13 +11,13 @@ const getRequestIdUrl =
 const getFlightInfoUrl =
   "https://ws.alibaba.ir/api/v1/flights/domestic/available";
 
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 8081;
 
 app.listen(port, () => {
   console.log(`Server is started on localhost:${port} ...`);
 });
 
-const getInput = (text) => readline.question(text);
+const getInput = (text) => readline.question(chalk.red(text));
 
 const main = async (body) => {
   try {
@@ -69,7 +70,7 @@ const validationDateFormat = (date) => {
     child,
     infant,
   };
-  console.log("Well done. please wait to get results ...");
+  console.log(chalk.green("Well done. please wait to get results ..."));
   setInterval(async () => {
     await main(body);
   }, 20000);
