@@ -48,10 +48,19 @@ const validationDateFormat = (date) => {
     process.exit(1);
   }
   const origin = await getInput("Enter your origin : ");
+  if (!origin) {
+    console.log("Please enter your origin");
+    process.exit(1);
+  }
   const destination = await getInput("Enter your destination : ");
-  const adult = +(await getInput("Enter your adult count : ")) || 1;
-  const child = +(await getInput("Enter your child count : ")) || 0;
-  const infant = +(await getInput("Enter your infant count : ")) || 0;
+  if (!destination) {
+    console.log("Please enter your destination");
+    process.exit(1);
+  }
+  const adult = +(await getInput("Enter your adult count (optional) : ")) || 1;
+  const child = +(await getInput("Enter your child count (optional) : ")) || 0;
+  const infant =
+    +(await getInput("Enter your infant count (optional) : ")) || 0;
   const body = {
     origin,
     destination,
@@ -60,7 +69,7 @@ const validationDateFormat = (date) => {
     child,
     infant,
   };
-
+  console.log("Well done. please wait to get results ...");
   setInterval(async () => {
     await main(body);
   }, 20000);
