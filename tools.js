@@ -1,5 +1,6 @@
 const readline = require("readline-sync");
 const chalk = require("chalk");
+const moment = require("moment");
 
 exports.getInput = (text, color) => {
   switch (color) {
@@ -22,4 +23,10 @@ exports.logger = (text, color) => {
     case "yellow":
       return console.log(chalk.yellow(text));
   }
+};
+
+exports.validationDateFormat = (date) => {
+  const dateFormat = "YYYY-MM-DD";
+  const toDateFormat = moment(new Date(date)).format(dateFormat);
+  return moment(toDateFormat, dateFormat, true).isValid();
 };

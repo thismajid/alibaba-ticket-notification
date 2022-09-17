@@ -1,9 +1,8 @@
 const express = require("express");
 const { Webhook, MessageBuilder } = require("discord-webhook-node");
 const axios = require("axios");
-const moment = require("moment");
 
-const { logger, getInput } = require("./tools");
+const { logger, getInput, validationDateFormat } = require("./tools");
 
 const app = express();
 let sentry;
@@ -41,12 +40,6 @@ const main = async (body) => {
   }
 };
 
-const validationDateFormat = (date) => {
-  const dateFormat = "YYYY-MM-DD";
-  const toDateFormat = moment(new Date(date)).format(dateFormat);
-  return moment(toDateFormat, dateFormat, true).isValid();
-};
-
 (async () => {
   const departureDate = await getInput(
     "Enter your desired date with this format (yyyy-mm-dd) : ",
@@ -81,7 +74,7 @@ const validationDateFormat = (date) => {
     infant,
   };
   const discordWebhook = await getInput(
-    "Enter your discord webhook id : ",
+    "Enter your discord webhook URL : ",
     "red"
   );
   sentry = new Webhook(discordWebhook);
