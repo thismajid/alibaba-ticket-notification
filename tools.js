@@ -18,5 +18,7 @@ exports.logger = (text, color) => {
       return console.log(chalk.green(text));
     case "blue":
       return console.log(chalk.blue(text));
+    case "yellow":
+      return console.log(chalk.yellow(text));
   }
 };
