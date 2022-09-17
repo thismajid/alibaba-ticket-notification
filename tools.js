@@ -1,6 +1,7 @@
 const readline = require("readline-sync");
 const chalk = require("chalk");
 const moment = require("moment");
+const jmoment = require("jalali-moment");
 
 exports.getInput = (text, color) => {
   switch (color) {
@@ -30,3 +31,9 @@ exports.validationDateFormat = (date) => {
   const toDateFormat = moment(new Date(date)).format(dateFormat);
   return moment(toDateFormat, dateFormat, true).isValid();
 };
+
+exports.dateToShamsi = (date) =>
+  jmoment(date, "YYYY-MM-DD").locale("fa").format("YYYY/MM/DD");
+
+exports.getHours = (date) =>
+  jmoment(date, "YYYY-MM-DD HH:mm").locale("fa").format("HH:mm");

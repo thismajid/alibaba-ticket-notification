@@ -2,7 +2,13 @@ const express = require("express");
 const { Webhook, MessageBuilder } = require("discord-webhook-node");
 const axios = require("axios");
 
-const { logger, getInput, validationDateFormat } = require("./tools");
+const {
+  logger,
+  getInput,
+  validationDateFormat,
+  dateToShamsi,
+  getHours,
+} = require("./tools");
 
 const app = express();
 let sentry;
@@ -24,15 +30,22 @@ const main = async (body) => {
         `${getFlightInfoUrl}/${firstReq?.result?.requestId}`
       );
       for (const res of secondReq.result.departing) {
-        const message = `مبدا: ${res.originName} \n مقصد: ${res.destinationName}
-         \n شرکت هواپیمایی: ${res.airlineName} \n کلاس پرواز: ${res.classTypeName}  
-         \n نوع هواپیما: ${res.aircraft} \n تعداد صندلی باقی‌مانده: ${res.seat}`;
+        const message = `
+        مبدا: ${res.originName}
+        مقصد: ${res.destinationName}
+        تاریخ پرواز: ${dateToShamsi(res.leaveDateTime)}
+        ساعت شروغ پرواز: ${getHours(res.leaveDateTime)}
+        ساعت پایان پرواز: ${getHours(res.arrivalDateTime)}
+        شرکت هواپیمایی: ${res.airlineName}
+        کلاس پرواز: ${res.classTypeName}  
+        نوع هواپیما: ${res.aircraft}
+        تعداد صندلی باقی‌مانده: ${res.seat}`;
         const embed = new MessageBuilder()
           .setTitle("Ticket alert")
           .setColor("#00b0f4")
           .setDescription(message);
         sentry.send(embed);
-        logger("message sent", "green");
+        logger("message sent", "info");
       }
     }, 2500);
   } catch (e) {
