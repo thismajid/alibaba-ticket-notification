@@ -26,7 +26,7 @@ const main = async (body) => {
       logger(secondReq, "blue");
     }, 2500);
   } catch (e) {
-    console.log(e);
+    logger(e, "yellow");
   }
 };
 
