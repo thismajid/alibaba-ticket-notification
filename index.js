@@ -1,15 +1,11 @@
 const express = require("express");
 const axios = require("axios");
-const readline = require("readline-sync");
 const moment = require("moment");
-const chalk = require("chalk");
 
-const { logger } = require("./tools");
+const { logger, getInput, getFlightInfoUrl } = require("./tools");
 
 const app = express();
 
-const getRequestIdUrl =
-  "https://ws.alibaba.ir/api/v1/flights/domestic/available";
 const getFlightInfoUrl =
   "https://ws.alibaba.ir/api/v1/flights/domestic/available";
 
@@ -19,18 +15,9 @@ app.listen(port, () =>
   logger(`Server is started on localhost:${port} ...`, "green")
 );
 
-const getInput = (text, color) => {
-  switch (color) {
-    case "red":
-      return readline.question(chalk.red(text));
-    case "blue":
-      return readline.question(chalk.blue(text));
-  }
-};
-
 const main = async (body) => {
   try {
-    const { data: firstReq } = await axios.post(getRequestIdUrl, body);
+    const { data: firstReq } = await axios.post(getFlightInfoUrl, body);
     logger(firstReq, "green");
     setTimeout(async () => {
       const { data: secondReq } = await axios.get(
@@ -82,7 +69,7 @@ const validationDateFormat = (date) => {
     child,
     infant,
   };
-  console.log(chalk.green("Well done. please wait to get results ..."));
+  logger("Well done. please wait to get results ...", "green");
   setInterval(async () => {
     await main(body);
   }, 20000);
