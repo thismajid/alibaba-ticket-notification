@@ -1,10 +1,12 @@
 const express = require("express");
+const { Webhook, MessageBuilder } = require("discord-webhook-node");
 const axios = require("axios");
 const moment = require("moment");
 
-const { logger, getInput, getFlightInfoUrl } = require("./tools");
+const { logger, getInput } = require("./tools");
 
 const app = express();
+let sentry;
 
 const getFlightInfoUrl =
   "https://ws.alibaba.ir/api/v1/flights/domestic/available";
@@ -18,12 +20,21 @@ app.listen(port, () =>
 const main = async (body) => {
   try {
     const { data: firstReq } = await axios.post(getFlightInfoUrl, body);
-    logger(firstReq, "green");
     setTimeout(async () => {
       const { data: secondReq } = await axios.get(
         `${getFlightInfoUrl}/${firstReq?.result?.requestId}`
       );
-      logger(secondReq, "blue");
+      for (const res of secondReq.result.departing) {
+        const message = `مبدا: ${res.originName} \n مقصد: ${res.destinationName}
+         \n شرکت هواپیمایی: ${res.airlineName} \n کلاس پرواز: ${res.classTypeName}  
+         \n نوع هواپیما: ${res.aircraft} \n تعداد صندلی باقی‌مانده: ${res.seat}`;
+        const embed = new MessageBuilder()
+          .setTitle("Ticket alert")
+          .setColor("#00b0f4")
+          .setDescription(message);
+        sentry.send(embed);
+        logger("message sent", "green");
+      }
     }, 2500);
   } catch (e) {
     logger(e, "yellow");
@@ -69,6 +80,11 @@ const validationDateFormat = (date) => {
     child,
     infant,
   };
+  const discordWebhook = await getInput(
+    "Enter your discord webhook id : ",
+    "red"
+  );
+  sentry = new Webhook(discordWebhook);
   logger("Well done. please wait to get results ...", "green");
   setInterval(async () => {
     await main(body);

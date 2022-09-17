@@ -11,6 +11,7 @@ exports.getInput = (text, color) => {
 };
 
 exports.logger = (text, color) => {
+  if (typeof text === "object") text = JSON.stringify(text);
   switch (color) {
     case "red":
       return console.log(chalk.red(text));
